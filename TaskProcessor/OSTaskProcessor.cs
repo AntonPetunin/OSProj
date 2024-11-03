@@ -1,6 +1,6 @@
 
 using OSProj.Generator;
-using OSProj.TaskProcessor;
+using OSProj.TaskProcessor.ThreadExecutors;
 
 namespace OSProj.TaskProcessor
 {
@@ -8,8 +8,8 @@ namespace OSProj.TaskProcessor
   {
     private TaskGenerator _taskGenerator = new TaskGenerator();
     private TaskContainer _taskContainer = new TaskContainer();
-    private Thread? _processingThread;
-    public bool Running { get { return _processingThread != null ? _processingThread.IsAlive : false; } }
+    private ThreadExecutor? _processingThread;
+    public bool Running { get { return _processingThread != null ? _processingThread.IsRunning : false; } }
     //private ILogger<HomeController> _logger;
 
     public delegate bool TaskWaitCheck(OSTask task);
@@ -33,36 +33,44 @@ namespace OSProj.TaskProcessor
     {
       if (_processingThread == null)
       {
-        _processingThread = new Thread(() =>
+        Action threadAction = () =>
         {
           Thread.CurrentThread.IsBackground = true;
 
-          while (true)
+          OSTask? task = _taskContainer.PopMainTask();
+
+          if (task != null)
           {
-            OSTask? task = _taskContainer.PopMainTask();
+            Task.Delay(200);
+            task.Run();
+            //_logger.LogInformation("Task {id} is running.", task.Id);
 
-            if (task != null)
+            if (OnTaskWaitCheck != null && OnTaskWaitCheck.Invoke(task))
             {
-              task.Run();
-              //_logger.LogInformation("Task {id} is running.", task.Id);
-
-              if (OnTaskWaitCheck != null && OnTaskWaitCheck.Invoke(task))
-              {
-                task.Wait();
-                task.Dispose();
-              }
-
-              _taskContainer.UpdateSubscriber();
+              task.Wait();
+              task.Dispose();
             }
-            else
-            {
-              Thread.Sleep(1000);
-            }
+
+            _taskContainer.UpdateSubscriber();
           }
-        });
+          else
+          {
+            Thread.Sleep(1000);
+          }
+        };
 
-        _processingThread.Start();
+        _processingThread = new LoopExecutor(threadAction);
+        _processingThread.Run();
         //_logger.LogInformation("Task processor was started.");
+      }
+    }
+
+    public void Stop()
+    {
+      if (_processingThread != null)
+      {
+        _processingThread.Cancel();
+        _processingThread = null;
       }
     }
 
@@ -137,5 +145,6 @@ namespace OSProj.TaskProcessor
 
       //_logger.LogInformation("Task {id} was activated.", task.Id);
     }
+
   }
 }

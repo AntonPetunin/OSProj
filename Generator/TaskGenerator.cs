@@ -1,11 +1,13 @@
 
 
+using OSProj.TaskProcessor.ThreadExecutors;
+
 namespace OSProj.Generator
 {
     public class TaskGenerator
     {
         private List<OSTask> _tasks = new();
-        private Tuple<int, int> _durationFork = Tuple.Create(2, 6);
+        private Tuple<int, int> _durationFork = Tuple.Create(3, 7);
 
         public int GenerationCount { get; set; } = 8; // default
 

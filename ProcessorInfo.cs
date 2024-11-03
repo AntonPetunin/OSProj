@@ -1,5 +1,5 @@
-﻿using OSProj.Generator;
-using OSProj.TaskProcessor;
+﻿using OSProj.TaskProcessor;
+using OSProj.TaskProcessor.ThreadExecutors;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace OSProj
 {
-  public class ProcessorInfo
+    public class ProcessorInfo
   {
     private OSTaskProcessor _processor;
     private TaskQueue _mainTasksCollection = new();

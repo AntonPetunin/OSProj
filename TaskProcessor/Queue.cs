@@ -1,8 +1,8 @@
-using OSProj.Generator;
+using OSProj.TaskProcessor.ThreadExecutors;
 
 namespace OSProj.TaskProcessor
 {
-  public class TaskQueue
+    public class TaskQueue
   {
     private LinkedList<OSTask> _queue = new();
     public bool IsSorted { get; }

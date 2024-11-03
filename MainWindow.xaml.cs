@@ -34,7 +34,10 @@ namespace OSProj
     private void Start_Click(object sender, RoutedEventArgs e)
     {
       if (!_processor.Running)
+      {
         _processor.Start();
+        Stop_btn.Visibility = Visibility.Visible;
+      }
       else
         MessageBox.Show("Процесс уже запущен.");
     }
@@ -44,5 +47,10 @@ namespace OSProj
       TaskListView.ItemsSource = _info.Tasks;
     }
 
+    private void Stop_btn_Click(object sender, RoutedEventArgs e)
+    {
+      _processor.Stop();
+      Stop_btn.Visibility = Visibility.Hidden;
+    }
   }
 }

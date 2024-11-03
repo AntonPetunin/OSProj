@@ -1,8 +1,8 @@
-using OSProj.Generator;
+using OSProj.TaskProcessor.ThreadExecutors;
 
 namespace OSProj.TaskProcessor
 {
-  public class TaskContainer
+    public class TaskContainer
   {
     public int MaxMainContainerSize { get; set; } = 8;
 
