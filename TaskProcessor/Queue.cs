@@ -4,10 +4,10 @@ namespace OSProj.TaskProcessor
 {
     public class TaskQueue
   {
-    private LinkedList<OSTask> _queue = new();
+    private LinkedList<IOSTask> _queue = new();
     public bool IsSorted { get; }
     public int Count => _queue.Count;
-    public OSTask? Next => _queue.Count > 0 ? _queue.First() : null;
+    public IOSTask? Next => _queue.Count > 0 ? _queue.First() : null;
     public bool Empty => _queue.Count == 0;
 
 
@@ -16,12 +16,12 @@ namespace OSProj.TaskProcessor
       IsSorted = isSorted;
     }
 
-    public IEnumerable<OSTask> Get()
+    public IEnumerable<IOSTask> Get()
     {
       return _queue;
     }
 
-    public void Push(OSTask? item)
+    public void Push(IOSTask? item)
     {
       if (item == null)
         return;
@@ -50,9 +50,9 @@ namespace OSProj.TaskProcessor
       }
     }
 
-    public OSTask? Pop()
+    public IOSTask? Pop()
     {
-      OSTask? res = _queue.First?.Value;
+      IOSTask? res = _queue.First?.Value;
 
       if (res != null)
         _queue.RemoveFirst();

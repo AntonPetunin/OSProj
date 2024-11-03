@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace OSProj
 {
-    public class ProcessorInfo
+  public class ProcessorInfo
   {
     private OSTaskProcessor _processor;
     private TaskQueue _mainTasksCollection = new();
@@ -24,7 +24,7 @@ namespace OSProj
     //public TaskQueue? WaitingTask { get { return _waitingCollection; } }
     //public TaskQueue? SuspendedTasks { get { return _suspendedCollection; } }
 
-    public ObservableCollection<OSTask> Tasks { get; } = new ObservableCollection<OSTask>();
+    public ObservableCollection<IOSTask> Tasks { get; } = new();
 
     public ProcessorInfo(OSTaskProcessor processor, Dispatcher dispatcher)
     {
@@ -35,7 +35,7 @@ namespace OSProj
 
     private void UpdateQueuesInfo(TaskQueue mainTasks, TaskQueue waitingTasks, TaskQueue suspendedTasks)
     {
-      
+
       lock (_waitingCollection) lock (_suspendedCollection) lock (_mainTasksCollection)
           {
             _mainTasksCollection = mainTasks;
@@ -51,7 +51,7 @@ namespace OSProj
       {
         lock (Tasks)
         {
-          ObservableCollection<OSTask> refreshTasks = [.. _waitingCollection.Get(), .. _suspendedCollection.Get(), .. _mainTasksCollection.Get()];
+          ObservableCollection<IOSTask> refreshTasks = [.. _waitingCollection.Get(), .. _suspendedCollection.Get(), .. _mainTasksCollection.Get()];
           Tasks.Clear();
 
           foreach (var task in refreshTasks)

@@ -12,7 +12,7 @@ namespace OSProj.TaskProcessor
     public bool Running { get { return _processingThread != null ? _processingThread.IsRunning : false; } }
     //private ILogger<HomeController> _logger;
 
-    public delegate bool TaskWaitCheck(OSTask task);
+    public delegate bool TaskWaitCheck(IOSTask task);
     public event TaskWaitCheck? OnTaskWaitCheck;
 
     public OSTaskProcessor(/*ILogger<HomeController> logger*/)
@@ -24,7 +24,7 @@ namespace OSProj.TaskProcessor
     public void Generate()
     {
       _taskGenerator.Generate();
-      List<OSTask> tasks = _taskGenerator.PopGenerated();
+      List<IOSTask> tasks = _taskGenerator.PopGenerated();
       _taskContainer.AddTasks(tasks);
       _taskContainer.UpdateSubscriber();
     }
@@ -37,7 +37,7 @@ namespace OSProj.TaskProcessor
         {
           Thread.CurrentThread.IsBackground = true;
 
-          OSTask? task = _taskContainer.PopMainTask();
+          IOSTask? task = _taskContainer.PopMainTask();
 
           if (task != null)
           {
@@ -79,7 +79,7 @@ namespace OSProj.TaskProcessor
       _taskContainer.SetUpdateQueuesInfo(updateDelegate);
     }
 
-    private bool OnTaskWaitCheckHandler(OSTask task)
+    private bool OnTaskWaitCheckHandler(IOSTask task)
     {
       bool needWait = true;
 
@@ -104,7 +104,7 @@ namespace OSProj.TaskProcessor
       return needWait;
     }
 
-    private void Preempt(OSTask task)
+    private void Preempt(IOSTask task)
     {
       if (task.TaskType == TaskType.Extended)
       {
@@ -122,7 +122,7 @@ namespace OSProj.TaskProcessor
       //_logger.LogInformation("Task {id} was preempted.", task.Id);
     }
 
-    private void Wait(OSTask task)
+    private void Wait(IOSTask task)
     {
 
       //_logger.LogInformation("Task {id} has been placed in the waiting queue.", task.Id);
@@ -134,13 +134,13 @@ namespace OSProj.TaskProcessor
       //_logger.LogInformation("Release. Now tasks comes from waiting to ready queue.");
     }
 
-    private void Terminate(OSTask task)
+    private void Terminate(BaseOSTask task)
     {
 
       //_logger.LogInformation("Task {id} was terminated.", task.Id);
     }
 
-    private void Activate(OSTask task)
+    private void Activate(BaseOSTask task)
     {
 
       //_logger.LogInformation("Task {id} was activated.", task.Id);

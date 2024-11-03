@@ -41,7 +41,7 @@ namespace OSProj.TaskProcessor
       return _mainTasksCollection.Next?.Priority;
     }
 
-    public OSTask? PopMainTask()
+    public IOSTask? PopMainTask()
     {
       lock (_mainTasksCollection)
       {
@@ -49,7 +49,7 @@ namespace OSProj.TaskProcessor
       }
     }
 
-    public bool AddTaskToMain(OSTask task)
+    public bool AddTaskToMain(IOSTask task)
     {
       bool result = _mainTasksCollection.Count < MaxMainContainerSize;
 
@@ -59,7 +59,7 @@ namespace OSProj.TaskProcessor
       return result;
     }
 
-    public void AddTask(OSTask task)
+    public void AddTask(IOSTask task)
     {
       switch (task.Priority)
       {
@@ -78,9 +78,9 @@ namespace OSProj.TaskProcessor
       }
     }
 
-    public void AddTasks(List<OSTask> tasks)
+    public void AddTasks(List<IOSTask> tasks)
     {
-      foreach (OSTask task in tasks)
+      foreach (IOSTask task in tasks)
         AddTask(task);
 
       FillMainContainerFromSource();
@@ -148,12 +148,12 @@ namespace OSProj.TaskProcessor
     }
 
 
-    private OSTask? PopWaitingTask()
+    private IOSTask? PopWaitingTask()
     {
       return _waitingCollection.Pop();
     }
 
-    private OSTask? PopSuspendedTask()
+    private IOSTask? PopSuspendedTask()
     {
       return _suspendedCollection.Pop();
     }

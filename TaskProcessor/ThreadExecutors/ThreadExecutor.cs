@@ -42,13 +42,13 @@ namespace OSProj.TaskProcessor.ThreadExecutors
       }
     }
 
-    public void Wait()
+    public virtual void Wait()
     {
       if (_task != null)
         _task.Wait();
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
       if (CancelTokenSource != null)
         CancelTokenSource.Dispose();
