@@ -2,6 +2,7 @@
 using NLog;
 using OSProj.Generator;
 using OSProj.TaskProcessor.ThreadExecutors;
+using System.Threading.Tasks;
 
 namespace OSProj.TaskProcessor
 {
@@ -107,17 +108,7 @@ namespace OSProj.TaskProcessor
 
     private void Preempt(IOSTask task)
     {
-      if (task.TaskType == TaskType.Extended)
-      {
-        // TODO Сделать реализация для extended
-        task.Cancel(); // Временно
-      }
-      else
-      {
-        // TODO Сделать реализацию для base
-        task.Cancel();
-      }
-
+      task.Cancel(); // Временно
       task.TaskStatus = OSTaskStatus.Ready;
       _taskContainer.AddTaskToMain(task);
       _logger.Info($"Task {task.Id} was preempted.");
@@ -125,7 +116,7 @@ namespace OSProj.TaskProcessor
 
     public void Wait(IOSTask task)
     {
-
+      task.TaskStatus = OSTaskStatus.Waiting;
       _logger.Info($"Task {task.Id} has been placed in the waiting queue.");
     }
 

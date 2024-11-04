@@ -1,12 +1,10 @@
 ﻿using OSProj.TaskProcessor;
-using System.Text;
 using System.Windows;
 using NLog;
 using NLog.Config;
 
 namespace OSProj
 {
-
   public partial class MainWindow : Window
   {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();

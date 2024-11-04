@@ -1,7 +1,4 @@
-﻿
-
-using OSProj.TaskProcessor.ThreadExecutors;
-using System.Threading.Tasks;
+﻿using OSProj.TaskProcessor.ThreadExecutors;
 
 namespace OSProj.Generator
 {
@@ -10,7 +7,7 @@ namespace OSProj.Generator
     private List<IOSTask> _tasks = new();
     private Tuple<int, int> _durationFork = Tuple.Create(3, 7);
 
-    public int GenerationCount { get; set; } = 8; // default
+    public int GenerationCount { get; set; } = 8;
 
     public void Generate()
     {

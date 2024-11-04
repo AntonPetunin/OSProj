@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OSProj.Generator;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace OSProj.TaskProcessor.ThreadExecutors
 {
   public class LoopExecutor : ThreadExecutor
   {
+    protected ManualResetEvent _manualResetEvent = new(true);
     private long _loopingCount;
-    private ManualResetEvent _manualResetEvent = new(true);
 
     public LoopExecutor(Action threadFunc, uint loopingCount = 0) : base(threadFunc)
     {
@@ -62,16 +63,6 @@ namespace OSProj.TaskProcessor.ThreadExecutors
         CancelTokenSource.Cancel();
         _isRunning = false;
       }
-    }
-
-    public void Pause()
-    {
-      _manualResetEvent.Reset();
-    }
-
-    public void Resume()
-    {
-      _manualResetEvent.Set();
     }
   }
 }

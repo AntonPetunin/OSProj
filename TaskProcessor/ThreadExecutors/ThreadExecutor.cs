@@ -17,9 +17,13 @@ namespace OSProj.TaskProcessor.ThreadExecutors
     protected Action ThreadFunction { get; }
     protected CancellationTokenSource? CancelTokenSource { get; set; }
 
+    public delegate void TerminateTask();
+    public event TerminateTask OnTerminateTask;
+
     public ThreadExecutor(Action threadFunc)
     {
       ThreadFunction = threadFunc;
+      OnTerminateTask += Cancel;
     }
 
     public virtual void Run()
