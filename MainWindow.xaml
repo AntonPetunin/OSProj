@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OSProj"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
-    <Grid x:Name="MainGrid">
+        Title="MainWindow" Height="450" Width="808" Loaded="Window_Loaded">
+    <Grid x:Name="MainGrid" Margin="0,0,10,0">
         <Button Content="Сгенерировать задачи" Name="Generate_btn" HorizontalAlignment="Left" Margin="34,24,0,0" VerticalAlignment="Top" Height="25" Width="150" Click="Generate_Click"/>
         <Button Content="Запустить процессор" Name="Start_btn" HorizontalAlignment="Left" Margin="34,63,0,0" VerticalAlignment="Top" Height="25" Width="150" Click="Start_Click"/>
         <ListView Name="TaskListView" ItemsSource="{Binding}" Margin="34,103,431,10">
@@ -19,8 +19,14 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <TextBox Name="LoggingTextBox" HorizontalAlignment="Left" Margin="387,103,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="389" Height="321" RenderTransformOrigin="0.499,0.513"/>
         <Button Content="Остановить" x:Name="Stop_btn" HorizontalAlignment="Left" Margin="202,63,0,0" VerticalAlignment="Top" Height="25" Width="150" Visibility="Hidden" Click="Stop_btn_Click"/>
+        <Button Content="Приостановить" x:Name="PauseTask_btn" HorizontalAlignment="Left" Margin="202,24,0,0" VerticalAlignment="Top" Height="25" Width="103" Click="PauseTask_btn_Click"/>
+        <Button Content="Прервать" x:Name="TerminateTask_btn" HorizontalAlignment="Left" Margin="325,24,0,0" VerticalAlignment="Top" Height="25" Width="103" Click="TerminateTask_btn_Click"/>
+        <TextBox x:Name="LogTextBox" 
+                 VerticalScrollBarVisibility="Auto" 
+                 HorizontalScrollBarVisibility="Auto" 
+                 IsReadOnly="True" 
+                 TextWrapping="Wrap" Margin="390,103,10,10"/>
 
     </Grid>
 </Window>

@@ -1,4 +1,4 @@
-
+п»ї
 
 using OSProj.TaskProcessor.ThreadExecutors;
 using System.Threading.Tasks;
@@ -32,16 +32,9 @@ namespace OSProj.Generator
         }
         else if (taskType == TaskType.Extended)
         {
-          Action action = () =>
-          {
-            // TODO: Реализовать для расширенной задачи
-            //int duration = rnd.Next(_durationFork.Item1, _durationFork.Item2);
-
-            //for (int i = 0; i < duration; i++)
-            //  Thread.Sleep(1000);
-          };
-
-          task = new ExtendedOSTask(IdGenerator.Id, rnd.Next(0, 4), taskType, action);
+          Action action = () => Thread.Sleep(1000);
+          uint duration = (uint)rnd.Next(_durationFork.Item1, _durationFork.Item2);
+          task = new ExtendedOSTask(IdGenerator.Id, rnd.Next(0, 4), taskType, action, duration);
         }
 
         if (task != null)

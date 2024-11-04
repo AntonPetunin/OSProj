@@ -1,4 +1,5 @@
 
+using NLog;
 using OSProj.Generator;
 using OSProj.TaskProcessor.ThreadExecutors;
 
@@ -10,15 +11,15 @@ namespace OSProj.TaskProcessor
     private TaskContainer _taskContainer = new TaskContainer();
     private ThreadExecutor? _processingThread;
     public bool Running { get { return _processingThread != null ? _processingThread.IsRunning : false; } }
-    //private ILogger<HomeController> _logger;
+    private Logger _logger;
 
     public delegate bool TaskWaitCheck(IOSTask task);
     public event TaskWaitCheck? OnTaskWaitCheck;
 
-    public OSTaskProcessor(/*ILogger<HomeController> logger*/)
+    public OSTaskProcessor(Logger logger)
     {
       OnTaskWaitCheck += OnTaskWaitCheckHandler;
-      //_logger = logger;
+      _logger = logger;
     }
 
     public void Generate()
@@ -43,7 +44,7 @@ namespace OSProj.TaskProcessor
           {
             Task.Delay(200);
             task.Run();
-            //_logger.LogInformation("Task {id} is running.", task.Id);
+            _logger.Info($"Task {task.Id} is running.");
 
             if (OnTaskWaitCheck != null && OnTaskWaitCheck.Invoke(task))
             {
@@ -61,7 +62,7 @@ namespace OSProj.TaskProcessor
 
         _processingThread = new LoopExecutor(threadAction);
         _processingThread.Run();
-        //_logger.LogInformation("Task processor was started.");
+        _logger.Info("Task processor was started.");
       }
     }
 
@@ -86,7 +87,7 @@ namespace OSProj.TaskProcessor
       if (_taskContainer.GetMaxSourceTasksPriority() > _taskContainer.GetMaxWaitingPriority())
       {
         _taskContainer.FillMainContainerFromSource();
-        //_logger.LogInformation("Ready queue is filling by source containers.");
+        _logger.Info("Ready queue is filling by source containers.");
       }
       else
         Release();
@@ -119,31 +120,29 @@ namespace OSProj.TaskProcessor
 
       task.TaskStatus = OSTaskStatus.Ready;
       _taskContainer.AddTaskToMain(task);
-      //_logger.LogInformation("Task {id} was preempted.", task.Id);
+      _logger.Info($"Task {task.Id} was preempted.");
     }
 
-    private void Wait(IOSTask task)
+    public void Wait(IOSTask task)
     {
 
-      //_logger.LogInformation("Task {id} has been placed in the waiting queue.", task.Id);
+      _logger.Info($"Task {task.Id} has been placed in the waiting queue.");
     }
 
     private void Release()
     {
       _taskContainer.FillMainContainerFromWaiting();
-      //_logger.LogInformation("Release. Now tasks comes from waiting to ready queue.");
+      _logger.Info("Release. Now tasks comes from waiting to ready queue.");
     }
 
-    private void Terminate(BaseOSTask task)
+    public void Terminate(BaseOSTask task)
     {
-
-      //_logger.LogInformation("Task {id} was terminated.", task.Id);
+      _logger.Info($"Task {task.Id} was terminated.");
     }
 
-    private void Activate(BaseOSTask task)
+    public void Activate(BaseOSTask task)
     {
-
-      //_logger.LogInformation("Task {id} was activated.", task.Id);
+      _logger.Info($"Task {task.Id} was activated.");
     }
 
   }

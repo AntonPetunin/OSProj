@@ -44,8 +44,7 @@ namespace OSProj.TaskProcessor.ThreadExecutors
 
     public virtual void Wait()
     {
-      if (_task != null)
-        _task.Wait();
+      _task?.Wait();
     }
 
     public virtual void Dispose()

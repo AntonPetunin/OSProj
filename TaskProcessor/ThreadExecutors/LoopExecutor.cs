@@ -10,6 +10,7 @@ namespace OSProj.TaskProcessor.ThreadExecutors
   public class LoopExecutor : ThreadExecutor
   {
     private long _loopingCount;
+    private ManualResetEvent _manualResetEvent = new(true);
 
     public LoopExecutor(Action threadFunc, uint loopingCount = 0) : base(threadFunc)
     {
@@ -29,7 +30,10 @@ namespace OSProj.TaskProcessor.ThreadExecutors
           action = () =>
           {
             for (long i = 0; i < _loopingCount && !CancelTokenSource.Token.IsCancellationRequested; i++)
+            {
+              //_manualResetEvent.WaitOne();
               ThreadFunction();
+            }
           };
         }
         else
@@ -37,7 +41,10 @@ namespace OSProj.TaskProcessor.ThreadExecutors
           action = () =>
           {
             while (!CancelTokenSource.Token.IsCancellationRequested)
+            {
+              //_manualResetEvent.WaitOne();
               ThreadFunction();
+            }
           };
         }
 
@@ -55,6 +62,16 @@ namespace OSProj.TaskProcessor.ThreadExecutors
         CancelTokenSource.Cancel();
         _isRunning = false;
       }
+    }
+
+    public void Pause()
+    {
+      _manualResetEvent.Reset();
+    }
+
+    public void Resume()
+    {
+      _manualResetEvent.Set();
     }
   }
 }
