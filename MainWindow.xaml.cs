@@ -72,11 +72,12 @@ namespace OSProj
 
     private void PauseTask_btn_Click(object sender, RoutedEventArgs e)
     {
+      _processor.PauseActiveTask();
     }
 
     private void TerminateTask_btn_Click(object sender, RoutedEventArgs e)
     {
-
+      _processor.TerminateActiveTask();
     }
   }
 }

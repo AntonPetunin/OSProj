@@ -37,5 +37,35 @@ namespace OSProj.TaskProcessor.ThreadExecutors
     {
       base.Dispose();
     }
+
+    public void SetWaitingState()
+    {
+      throw new NotImplementedException();
+    }
+
+    public void SetActivatedState()
+    {
+      throw new NotImplementedException();
+    }
+
+    public void SetReadyFromSuspended()
+    {
+      throw new NotImplementedException();
+    }
+
+    public void SetReadyFromWaiting()
+    {
+      throw new NotImplementedException();
+    }
+
+    public void SetReadyFromRunning()
+    {
+      throw new NotImplementedException();
+    }
+
+    public void SetRunningState()
+    {
+      throw new NotImplementedException();
+    }
   }
 }

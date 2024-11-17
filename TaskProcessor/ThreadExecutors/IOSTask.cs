@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OSProj.TaskProcessor.ThreadExecutors
 {
-  public interface IOSTask
+  public interface IOSTask : ITaskStateSetter
   {
     public int Id { get; }
     public int Priority { get; }

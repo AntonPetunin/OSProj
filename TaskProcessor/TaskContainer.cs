@@ -59,6 +59,18 @@ namespace OSProj.TaskProcessor
       return result;
     }
 
+    public bool AddTaskToWaiting(IOSTask task)
+    {
+      _waitingCollection.Push(task);
+      return true;
+    }
+
+    public bool AddTaskToSuspended(IOSTask task)
+    {
+      _suspendedCollection.Push(task);
+      return true;
+    }
+
     public void AddTask(IOSTask task)
     {
       switch (task.Priority)
