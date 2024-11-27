@@ -2,21 +2,21 @@
 using System.Windows;
 using NLog;
 using NLog.Config;
+using System.Windows.Controls;
 
 namespace OSProj
 {
   public partial class MainWindow : Window
   {
-    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
-    private OSTaskProcessor _processor = new(logger);
+    private OSTaskProcessor _processor = new(ProcessorInfo.logger);
     private ProcessorInfo _info;
+    private double ProgressValue { get; set; }
 
     public MainWindow()
     {
-      _info = new(_processor, Dispatcher);
       InitializeComponent();
-      ConfigureLogging();
+
+      _info = new(_processor, TaskProgressBar, Dispatcher);
       TextBoxTarget.LogAction = AppendLogToTextBox;
     }
 
@@ -33,7 +33,8 @@ namespace OSProj
         if (!_processor.Running)
         {
           _processor.Start();
-          Stop_btn.Visibility = Visibility.Visible;
+          Stop_btn.IsEnabled = true;
+          Start_btn.IsEnabled = false;
         }
         else
           MessageBox.Show("Процесс уже запущен.");
@@ -48,17 +49,8 @@ namespace OSProj
     private void Stop_btn_Click(object sender, RoutedEventArgs e)
     {
       _processor.Stop();
-      Stop_btn.Visibility = Visibility.Hidden;
-    }
-
-
-    private void ConfigureLogging()
-    {
-      var config = new LoggingConfiguration();
-      var textBoxTarget = new TextBoxTarget();
-      textBoxTarget.Layout = "${longdate} ${level:uppercase=true} ${message} ${exception:format=toString}\n";
-      config.AddRule(LogLevel.Info, LogLevel.Fatal, textBoxTarget);
-      LogManager.Configuration = config;
+      Stop_btn.IsEnabled = false;
+      Start_btn.IsEnabled = true;
     }
 
     private void AppendLogToTextBox(string text)
@@ -78,6 +70,11 @@ namespace OSProj
     private void TerminateTask_btn_Click(object sender, RoutedEventArgs e)
     {
       _processor.TerminateActiveTask();
+    }
+
+    private void Activate_Task_Click(object sender, RoutedEventArgs e)
+    {
+      _processor.Activate();
     }
   }
 }

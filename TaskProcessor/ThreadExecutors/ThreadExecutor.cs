@@ -10,6 +10,7 @@ namespace OSProj.TaskProcessor.ThreadExecutors
 {
   public class ThreadExecutor
   {
+    protected long _loopingCount;
     protected bool _isRunning = false;
     protected Task? _task;
 
@@ -17,13 +18,10 @@ namespace OSProj.TaskProcessor.ThreadExecutors
     protected Action ThreadFunction { get; }
     protected CancellationTokenSource? CancelTokenSource { get; set; }
 
-    public delegate void TerminateTask();
-    public event TerminateTask OnTerminateTask;
-
-    public ThreadExecutor(Action threadFunc)
+    public ThreadExecutor(Action threadFunc, uint loopingCount = 0)
     {
       ThreadFunction = threadFunc;
-      OnTerminateTask += Cancel;
+      _loopingCount = loopingCount;
     }
 
     public virtual void Run()
@@ -41,7 +39,6 @@ namespace OSProj.TaskProcessor.ThreadExecutors
       if (CancelTokenSource != null)
       {
         CancelTokenSource.Cancel();
-        CancelTokenSource.Dispose();
         _isRunning = false;
       }
     }

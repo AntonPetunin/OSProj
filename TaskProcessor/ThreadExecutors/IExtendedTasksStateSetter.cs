@@ -6,13 +6,9 @@ using System.Threading.Tasks;
 
 namespace OSProj.TaskProcessor.ThreadExecutors
 {
-  public interface ITaskStateSetter
+  public interface IExtendedTasksStateSetter
   {
     public void SetWaitingState();
-    public void SetActivatedState();
-    public void SetReadyFromSuspended();
     public void SetReadyFromWaiting();
-    public void SetReadyFromRunning();
-    public void SetRunningState();
   }
 }

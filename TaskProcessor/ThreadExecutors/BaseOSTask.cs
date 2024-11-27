@@ -4,23 +4,58 @@ namespace OSProj.TaskProcessor.ThreadExecutors
 {
   public class BaseOSTask : ThreadExecutor, IOSTask
   {
+    protected OSTaskProcessor.UpdateProgressBarDelegate? _updateProgressBar;
+
     public int Id { get; }
     public int Priority { get; }
-    public TaskType TaskType { get; }
-    public OSTaskStatus TaskStatus { get; set; } = OSTaskStatus.Created;
+    public virtual TaskType TaskType { get { return TaskType.Base; } }
+    public OSTaskStatus TaskStatus { get; set; } = OSTaskStatus.Ready;
 
-    public BaseOSTask(int id, int priority, TaskType taskType, Action taskFunc)
-      : base(taskFunc)
+    public BaseOSTask(int id, int priority, Action threadFunc, uint loopingCount = 0)
+      : base(threadFunc, loopingCount)
     {
       Id = id;
       Priority = priority;
-      TaskType = taskType;
-      OnTerminateTask += Cancel;
     }
 
     public override void Run()
     {
-      base.Run();
+      if (!_isRunning)
+      {
+        CancelTokenSource = new CancellationTokenSource();
+        Action action;
+
+        if (_loopingCount > 0)
+        {
+          action = () =>
+          {
+            for (long i = 0; i < _loopingCount && !CancelTokenSource.Token.IsCancellationRequested; i++)
+            {
+              ThreadFunction();
+              if (_updateProgressBar != null)
+              {
+                double persentage = (double)i / (_loopingCount - 1);
+                _updateProgressBar.Invoke(persentage);
+              }
+            }
+          };
+        }
+        else
+        {
+          action = () =>
+          {
+            while (!CancelTokenSource.Token.IsCancellationRequested)
+              ThreadFunction();
+          };
+        }
+
+        action += () => { CancelTokenSource.Dispose(); };
+
+        _task = Task.Run(action, CancelTokenSource.Token);
+        _isRunning = true;
+      }
+
+      SetRunningState();
     }
 
     public override void Cancel()
@@ -38,34 +73,33 @@ namespace OSProj.TaskProcessor.ThreadExecutors
       base.Dispose();
     }
 
-    public void SetWaitingState()
+    public virtual void SetSuspendedState()
     {
-      throw new NotImplementedException();
+      TaskStatus = OSTaskStatus.Suspended;
+      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the SUSPENDED queue.");
     }
 
-    public void SetActivatedState()
+    public virtual void SetReadyFromSuspended()
     {
-      throw new NotImplementedException();
+      TaskStatus = OSTaskStatus.Ready;
+      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the READY queue.");
     }
 
-    public void SetReadyFromSuspended()
+    public virtual void SetReadyFromRunning()
     {
-      throw new NotImplementedException();
+      TaskStatus = OSTaskStatus.Ready;
+      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the READY queue from RUNNING.");
     }
 
-    public void SetReadyFromWaiting()
+    public virtual void SetRunningState()
     {
-      throw new NotImplementedException();
+      TaskStatus = OSTaskStatus.Running;
+      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} start executing. It's RUNNING.");
     }
 
-    public void SetReadyFromRunning()
+    public void SetUpdateProgressBaseDelegate(OSTaskProcessor.UpdateProgressBarDelegate updateProgressBar)
     {
-      throw new NotImplementedException();
-    }
-
-    public void SetRunningState()
-    {
-      throw new NotImplementedException();
+      _updateProgressBar = updateProgressBar;
     }
   }
 }

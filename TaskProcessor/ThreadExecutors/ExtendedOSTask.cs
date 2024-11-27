@@ -8,44 +8,83 @@ using System.Threading.Tasks;
 
 namespace OSProj.TaskProcessor.ThreadExecutors
 {
-  public class ExtendedOSTask : LoopExecutor, IOSTask
+  public class ExtendedOSTask : BaseOSTask, IExtendedTasksStateSetter
   {
-    private bool _paused = false;
+    private ManualResetEventSlim _processorThreadEvent = new(false);
+    private ManualResetEventSlim _taskEvent = new(false);
 
-    public int Id { get; }
-    public int Priority { get; }
-    public TaskType TaskType { get; }
-    public OSTaskStatus TaskStatus { get; set; } = OSTaskStatus.Created;
+    private bool _paused = false;
+    public override TaskType TaskType { get { return TaskType.Extended; } }
     public bool Paused { get { return _paused; } }
 
-    public delegate void PauseTaskHandler();
-    public event PauseTaskHandler? OnTaskPause;
-    public delegate void ResumeTaskHandler();
-    public event ResumeTaskHandler? OnTaskResume;
 
-    public ExtendedOSTask(int id, int priority, TaskType taskType, Action threadFunc, uint loopingCount = 0) : base(threadFunc, loopingCount)
+    public ExtendedOSTask(int id, int priority, Action threadFunc, uint loopingCount = 0)
+      : base(id, priority, threadFunc, loopingCount)
     {
-      Id = id;
-      Priority = priority;
-      TaskType = taskType;
-
-      OnTaskPause += () => _manualResetEvent.Reset();
-      OnTaskResume += () => _manualResetEvent.Set();
+      _processorThreadEvent.Reset();
+      _taskEvent.Set();
     }
 
     public override void Run()
     {
-      base.Run();
+      if (!Paused)
+      {
+        if (!_isRunning)
+        {
+          CancelTokenSource = new CancellationTokenSource();
+          Action action = () =>
+          {
+            _processorThreadEvent.Reset();
+          };
+
+          if (_loopingCount > 0)
+          {
+            action += () =>
+            {
+              for (long i = 0; i < _loopingCount && !CancelTokenSource.Token.IsCancellationRequested; i++)
+              {
+                _taskEvent.Wait();
+                ThreadFunction();
+              }
+            };
+          }
+          else
+          {
+            action += () =>
+            {
+              while (!CancelTokenSource.Token.IsCancellationRequested)
+              {
+                _taskEvent.Wait();
+                ThreadFunction();
+              }
+            };
+          }
+
+          action += () =>
+          {
+            _processorThreadEvent.Set();
+            CancelTokenSource.Dispose();
+          };
+
+          _task = Task.Run(action, CancelTokenSource.Token);
+          _isRunning = true;
+        }
+      }
+      else
+        Resume();
+
+      SetRunningState();
     }
 
     public override void Cancel()
     {
       base.Cancel();
+      _processorThreadEvent.Set();
     }
 
     public override void Wait()
     {
-      base.Wait();
+      _processorThreadEvent.Wait();
     }
 
     public override void Dispose()
@@ -55,44 +94,52 @@ namespace OSProj.TaskProcessor.ThreadExecutors
 
     public void Pause()
     {
-      OnTaskPause?.Invoke();
+      _processorThreadEvent.Set();
+      _taskEvent.Reset();
       _paused = true;
     }
 
     public void Resume()
     {
-      OnTaskResume?.Invoke();
+      _taskEvent.Set();
+      _processorThreadEvent.Reset();
       _paused = false;
     }
 
     public void SetWaitingState()
     {
-      throw new NotImplementedException();
+      TaskStatus = OSTaskStatus.Waiting;
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the WAITING queue.");
     }
 
-    public void SetActivatedState()
+    public override void SetSuspendedState()
     {
-      throw new NotImplementedException();
+      TaskStatus = OSTaskStatus.Suspended;
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the SUSPENDED queue.");
     }
 
-    public void SetReadyFromSuspended()
+    public override void SetReadyFromSuspended()
     {
-      throw new NotImplementedException();
+      TaskStatus = OSTaskStatus.Ready;
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the READY queue.");
     }
 
     public void SetReadyFromWaiting()
     {
-      throw new NotImplementedException();
+      TaskStatus = OSTaskStatus.Ready;
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the READY queue from WAITING.");
     }
 
-    public void SetReadyFromRunning()
+    public override void SetReadyFromRunning()
     {
-      throw new NotImplementedException();
+      TaskStatus = OSTaskStatus.Ready;
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the READY queue from RUNNING.");
     }
 
-    public void SetRunningState()
+    public override void SetRunningState()
     {
-      throw new NotImplementedException();
+      TaskStatus = OSTaskStatus.Running;
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} start executing (RUNNING).");
     }
   }
 }

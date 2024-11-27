@@ -8,6 +8,9 @@ namespace OSProj.TaskProcessor
 {
   public partial class OSTaskProcessor
   {
+    public delegate void UpdateProgressBarDelegate(double percentage);
+    private UpdateProgressBarDelegate? _updateProgressBar;
+
     private TaskGenerator _taskGenerator = new TaskGenerator();
     private TaskContainer _taskContainer = new TaskContainer();
     private ThreadExecutor? _processingThread;
@@ -18,6 +21,7 @@ namespace OSProj.TaskProcessor
 
     public delegate bool TaskWaitCheck(IOSTask task);
     public event TaskWaitCheck? OnTaskWaitCheck;
+
 
     public OSTaskProcessor(Logger logger)
     {
@@ -41,21 +45,22 @@ namespace OSProj.TaskProcessor
         {
           Thread.CurrentThread.IsBackground = true;
 
-          _activeTask = _taskContainer.PopMainTask();
+          _activeTask = _taskContainer.GetTopTaskAsActive();
+          _taskContainer.UpdateSubscriber();
 
           if (_activeTask != null)
           {
             Task.Delay(200);
+
+            if (_updateProgressBar != null)
+              _activeTask.SetUpdateProgressBaseDelegate(_updateProgressBar);
+
             _activeTask.Run();
-            _logger.Info($"Task {_activeTask.Id} is running.");
 
             if (OnTaskWaitCheck != null && OnTaskWaitCheck.Invoke(_activeTask))
             {
               _activeTask.Wait();
-              _activeTask.Dispose();
             }
-
-            _taskContainer.UpdateSubscriber();
           }
           else
           {
@@ -63,7 +68,7 @@ namespace OSProj.TaskProcessor
           }
         };
 
-        _processingThread = new LoopExecutor(threadAction);
+        _processingThread = new ThreadExecutor(threadAction);
         _processingThread.Run();
         _logger.Info("Task processor was started.");
       }
@@ -83,21 +88,21 @@ namespace OSProj.TaskProcessor
       _taskContainer.SetUpdateQueuesInfo(updateDelegate);
     }
 
+    public void SetUpdateProgressBarDelegate(UpdateProgressBarDelegate updateProgressBar)
+    {
+      _updateProgressBar = updateProgressBar;
+    }
+
     public void PauseActiveTask()
     {
       if (_activeTask != null && _activeTask.TaskType == TaskType.Extended)
-      {
-        ((ExtendedOSTask)_activeTask).Pause();
         Wait(_activeTask);
-      }
     }
 
     public void TerminateActiveTask()
     {
       if (_activeTask != null)
-      {
         Terminate(_activeTask);
-      }
     }
 
 
@@ -105,22 +110,22 @@ namespace OSProj.TaskProcessor
     {
       bool needWait = true;
 
-      // if (activateEventReceived)
-      // Activate()
       int waitPriority = _taskContainer.GetMaxWaitingPriority();
 
       if (_taskContainer.GetMaxSourceTasksPriority() > waitPriority)
       {
         _taskContainer.FillMainContainerFromSource();
         _logger.Info("Ready queue is filling by source containers.");
+
+        if (_taskContainer.GetNextTaskPriority() > task.Priority)
+        {
+          Preempt(task);
+          needWait = false;
+        }
       }
       else if (waitPriority > -1)
+      { 
         Release();
-
-      if (_taskContainer.GetNextTaskPriority() > task.Priority)
-      {
-        Preempt(task);
-        needWait = false;
       }
 
       return needWait;
@@ -129,34 +134,32 @@ namespace OSProj.TaskProcessor
     private void Preempt(IOSTask task)
     {
       task.Cancel(); // Временно
-      task.TaskStatus = OSTaskStatus.Ready;
+      task.SetReadyFromRunning();
       _taskContainer.AddTaskToMain(task);
-      _logger.Info($"Task {task.Id} was preempted.");
     }
 
     private void Wait(IOSTask task)
     {
-      task.TaskStatus = OSTaskStatus.Waiting;
-      _taskContainer.AddTaskToWaiting(task);
-      _logger.Info($"Task {task.Id} has been placed in the waiting queue.");
+      if (_taskContainer.AddTaskToWaiting(task))
+      {
+        ((ExtendedOSTask)task).Pause();
+      }
     }
 
-    private void Release()
+    public void Release()
     {
       _taskContainer.FillMainContainerFromWaiting();
-      _logger.Info("Release. Now tasks comes from waiting to ready queue.");
     }
 
     private void Terminate(IOSTask task)
     {
-      _taskContainer.AddTaskToSuspended(task);
-      _logger.Info($"Task {task.Id} was terminated.");
+      if (_taskContainer.AddTaskToSuspended(task))
+        task.Cancel();
     }
 
-    private void Activate()
+    public void Activate()
     {
-      //_taskContainer.FillMainContainerFromSuspended();
-      //_logger.Info($"Task {task.Id} was activated.");
+      _taskContainer.FillMainContainerFromSuspended();
     }
   }
 }

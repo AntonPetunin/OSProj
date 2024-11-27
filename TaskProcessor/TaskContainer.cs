@@ -2,10 +2,11 @@ using OSProj.TaskProcessor.ThreadExecutors;
 
 namespace OSProj.TaskProcessor
 {
-    public class TaskContainer
+  public class TaskContainer
   {
     public int MaxMainContainerSize { get; set; } = 8;
 
+    private IOSTask? _activeTask;
     private TaskQueue _mainTasksCollection = new();
     private TaskQueue _priority0Tasks = new();
     private TaskQueue _priority1Tasks = new();
@@ -15,7 +16,7 @@ namespace OSProj.TaskProcessor
     private TaskQueue _waitingCollection = new();
     private TaskQueue _suspendedCollection = new();
 
-    public delegate void UpdateQueuesInfo(TaskQueue mainTasks, TaskQueue waitingTasks, TaskQueue suspendedTasks);
+    public delegate void UpdateQueuesInfo(IOSTask? activeTask, TaskQueue mainTasks, TaskQueue waitingTasks, TaskQueue suspendedTasks);
     private UpdateQueuesInfo? _updateDelegate;
 
     public TaskContainer()
@@ -33,12 +34,21 @@ namespace OSProj.TaskProcessor
     public void UpdateSubscriber()
     {
       if (_updateDelegate != null)
-        _updateDelegate(_mainTasksCollection, _waitingCollection, _suspendedCollection);
+        _updateDelegate(_activeTask, _mainTasksCollection, _waitingCollection, _suspendedCollection);
     }
 
     public int? GetNextTaskPriority()
     {
       return _mainTasksCollection.Next?.Priority;
+    }
+
+    public IOSTask? GetTopTaskAsActive()
+    {
+      lock(_mainTasksCollection)
+      {
+        _activeTask = PopMainTask();
+        return _activeTask;
+      }
     }
 
     public IOSTask? PopMainTask()
@@ -54,21 +64,40 @@ namespace OSProj.TaskProcessor
       bool result = _mainTasksCollection.Count < MaxMainContainerSize;
 
       if (result)
+      {
         _mainTasksCollection.Push(task);
+        UpdateSubscriber();
+      }
 
       return result;
     }
 
     public bool AddTaskToWaiting(IOSTask task)
     {
-      _waitingCollection.Push(task);
-      return true;
+      bool res = task.TaskType == Generator.TaskType.Extended && task.TaskStatus == Generator.OSTaskStatus.Running;
+
+      if (res)
+      {
+        _waitingCollection.Push(task);
+        ((IExtendedTasksStateSetter)task).SetWaitingState();
+        UpdateSubscriber();
+      }
+
+      return res;
     }
 
     public bool AddTaskToSuspended(IOSTask task)
     {
-      _suspendedCollection.Push(task);
-      return true;
+      bool res = task.TaskStatus == Generator.OSTaskStatus.Running;
+
+      if (res)
+      {
+        task.SetSuspendedState();
+        _suspendedCollection.Push(task);
+        UpdateSubscriber();
+      }
+
+      return res;
     }
 
     public void AddTask(IOSTask task)
@@ -126,11 +155,53 @@ namespace OSProj.TaskProcessor
           isAllEmpty = true;
         }
       }
+
+      if (!isAllEmpty)
+        UpdateSubscriber();
     }
 
     public void FillMainContainerFromWaiting()
     {
+      int emptyPlacesCount = MaxMainContainerSize - _mainTasksCollection.Count;
 
+      if (emptyPlacesCount > 0)
+      {
+        emptyPlacesCount = _waitingCollection.Count < emptyPlacesCount ? _waitingCollection.Count : emptyPlacesCount;
+
+        for (int i = 0; i < emptyPlacesCount; i++)
+        {
+          IOSTask? task = _waitingCollection.Pop();
+
+          if (task != null)
+          {
+            _mainTasksCollection.Push(task);
+            ((IExtendedTasksStateSetter)task).SetReadyFromWaiting();
+            UpdateSubscriber();
+          }
+        }
+      }
+    }
+
+    public void FillMainContainerFromSuspended()
+    {
+      int emptyPlacesCount = MaxMainContainerSize - _mainTasksCollection.Count;
+
+      if (emptyPlacesCount > 0)
+      {
+        emptyPlacesCount = _suspendedCollection.Count < emptyPlacesCount ? _suspendedCollection.Count : emptyPlacesCount;
+
+        for (int i = 0; i < emptyPlacesCount; i++)
+        {
+          IOSTask? task = _suspendedCollection.Pop();
+
+          if (task != null)
+          {
+            _mainTasksCollection.Push(task);
+            task.SetReadyFromSuspended();
+            UpdateSubscriber();
+          }
+        }
+      }
     }
 
     public int GetMaxWaitingPriority()
@@ -169,5 +240,6 @@ namespace OSProj.TaskProcessor
     {
       return _suspendedCollection.Pop();
     }
+
   }
 }

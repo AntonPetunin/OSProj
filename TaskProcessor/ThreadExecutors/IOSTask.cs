@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OSProj.TaskProcessor.ThreadExecutors
 {
-  public interface IOSTask : ITaskStateSetter
+  public interface IOSTask : IBaseTaskStateSetter
   {
     public int Id { get; }
     public int Priority { get; }
@@ -19,5 +19,6 @@ namespace OSProj.TaskProcessor.ThreadExecutors
     public void Cancel();
     public void Wait();
     public void Dispose();
+    void SetUpdateProgressBaseDelegate(OSTaskProcessor.UpdateProgressBarDelegate updateProgressBar);
   }
 }

@@ -8,11 +8,10 @@ namespace OSProj.Generator
 
     public enum OSTaskStatus
     {
-        Created = 0,
-        Running = 1,
-        Ready = 2,
-        Suspended = 3,
-        Waiting = 4,
-        Succeded = 5
+        Running = 0,
+        Ready = 1,
+        Suspended = 2,
+        Waiting = 3,
+        Finished = 4
     }
 }

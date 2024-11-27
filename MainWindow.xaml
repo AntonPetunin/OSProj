@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OSProj"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="808" Loaded="Window_Loaded">
-    <Grid x:Name="MainGrid" Margin="0,0,10,0">
-        <Button Content="Сгенерировать задачи" Name="Generate_btn" HorizontalAlignment="Left" Margin="34,24,0,0" VerticalAlignment="Top" Height="25" Width="150" Click="Generate_Click"/>
-        <Button Content="Запустить процессор" Name="Start_btn" HorizontalAlignment="Left" Margin="34,63,0,0" VerticalAlignment="Top" Height="25" Width="150" Click="Start_Click"/>
-        <ListView Name="TaskListView" ItemsSource="{Binding}" Margin="34,103,431,10">
+        Title="MainWindow" Height="536" Width="808" Loaded="Window_Loaded">
+    <Grid x:Name="MainGrid" Margin="0,0,10,6">
+        <Button Content="Сгенерировать задачи" Name="Generate_btn" HorizontalAlignment="Left" Margin="34,12,0,0" VerticalAlignment="Top" Height="24" Width="150" Click="Generate_Click"/>
+        <Button Content="Запустить процессор" Name="Start_btn" HorizontalAlignment="Left" Margin="34,44,0,0" VerticalAlignment="Top" Height="25" Width="150" Click="Start_Click"/>
+        <ListView Name="TaskListView" ItemsSource="{Binding}" Margin="34,109,413,0" Height="351" VerticalAlignment="Top">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Width="30" DisplayMemberBinding="{Binding Path=Id}">Id</GridViewColumn>
@@ -19,14 +19,19 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Content="Остановить" x:Name="Stop_btn" HorizontalAlignment="Left" Margin="202,63,0,0" VerticalAlignment="Top" Height="25" Width="150" Visibility="Hidden" Click="Stop_btn_Click"/>
-        <Button Content="Приостановить" x:Name="PauseTask_btn" HorizontalAlignment="Left" Margin="202,24,0,0" VerticalAlignment="Top" Height="25" Width="103" Click="PauseTask_btn_Click"/>
-        <Button Content="Прервать" x:Name="TerminateTask_btn" HorizontalAlignment="Left" Margin="325,24,0,0" VerticalAlignment="Top" Height="25" Width="103" Click="TerminateTask_btn_Click"/>
+        <Button Content="Остановить" IsEnabled="False" x:Name="Stop_btn" HorizontalAlignment="Left" Margin="34,76,0,0" VerticalAlignment="Top" Height="24" Width="150" Visibility="Visible" Click="Stop_btn_Click"/>
+        <Button Content="Приостановить" x:Name="PauseTask_btn" HorizontalAlignment="Left" Margin="662,32,0,0" VerticalAlignment="Top" Height="25" Width="103" Click="PauseTask_btn_Click"/>
+        <Button Content="Прервать" x:Name="TerminateTask_btn" HorizontalAlignment="Left" Margin="662,64,0,0" VerticalAlignment="Top" Height="25" Width="103" Click="TerminateTask_btn_Click"/>
         <TextBox x:Name="LogTextBox" 
                  VerticalScrollBarVisibility="Auto" 
                  HorizontalScrollBarVisibility="Auto" 
                  IsReadOnly="True" 
-                 TextWrapping="Wrap" Margin="390,103,10,10"/>
+                 TextWrapping="Wrap" Margin="390,109,10,0" Height="351" VerticalAlignment="Top"/>
+        <ProgressBar Name="TaskProgressBar" Value="{Binding ProgressValue}" VerticalAlignment="Top" 
+                     Margin="223,56,177,0" Height="25" Minimum="0" Maximum="100" />
+        <Label Content="Выполнение задачи" HorizontalAlignment="Left" Margin="368,29,0,0" VerticalAlignment="Top" Height="40" Width="146"/>
+        <Button Content="Перезапустить задачи" x:Name="Activate_Task_Copy" HorizontalAlignment="Left" Margin="35,465,0,0" VerticalAlignment="Top" Height="24" Width="150" Click="Activate_Task_Click"/>
 
     </Grid>
+
 </Window>
