@@ -29,6 +29,11 @@ namespace OSProj.TaskProcessor
       _logger = logger;
     }
 
+    public void SetGenerator(TaskGenerator generator)
+    {
+      _taskGenerator = generator;
+    }
+
     public void Generate()
     {
       _taskGenerator.Generate();
@@ -47,7 +52,6 @@ namespace OSProj.TaskProcessor
           Thread.CurrentThread.IsBackground = true;
 
           _activeTask = _taskContainer.GetTopTaskAsActive();
-          _taskContainer.UpdateSubscriber();
 
           if (_activeTask != null)
           {
@@ -57,6 +61,7 @@ namespace OSProj.TaskProcessor
               _activeTask.SetUpdateProgressBaseDelegate(_updateProgressBar);
 
             _activeTask.Run();
+            _taskContainer.UpdateSubscriber();
 
             if (OnTaskWaitCheck != null && OnTaskWaitCheck.Invoke(_activeTask))
             {

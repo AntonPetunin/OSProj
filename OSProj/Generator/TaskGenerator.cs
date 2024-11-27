@@ -7,7 +7,7 @@ namespace OSProj.Generator
     private List<IOSTask> _tasks = new();
     private Tuple<int, int> _durationFork = Tuple.Create(4, 8);
 
-    public int GenerationCount { get; set; } = 1;
+    public int GenerationCount { get; set; } = 5;
 
     public void Generate()
     {

@@ -14,7 +14,7 @@ namespace OSProj.TaskProcessor.ThreadExecutors
     protected bool _isRunning = false;
     protected Task? _task;
 
-    public bool IsRunning { get { return IsRunning; } }
+    public bool IsRunning { get { return _isRunning; } }
     protected Action ThreadFunction { get; }
     protected CancellationTokenSource? CancelTokenSource { get; set; }
 
