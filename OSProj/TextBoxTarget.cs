@@ -4,15 +4,17 @@ using NLog.Targets;
 using System;
 using System.Windows;
 
-[Target("TextBoxTarget")]
-public sealed class TextBoxTarget : TargetWithLayout
+namespace OSProj
 {
-  public static Action<string>? LogAction { get; set; }
-
-  protected override void Write(LogEventInfo logEvent)
+  [Target("TextBoxTarget")]
+  public sealed class TextBoxTarget : TargetWithLayout
   {
-    string logMessage = Layout.Render(logEvent);
-    LogAction?.Invoke(logMessage);
+    public static Action<string>? LogAction { get; set; }
+
+    protected override void Write(LogEventInfo logEvent)
+    {
+      string logMessage = Layout.Render(logEvent);
+      LogAction?.Invoke(logMessage);
+    }
   }
 }
-
