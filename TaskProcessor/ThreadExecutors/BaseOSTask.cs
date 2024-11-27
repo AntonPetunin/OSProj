@@ -51,6 +51,9 @@ namespace OSProj.TaskProcessor.ThreadExecutors
 
         action += () => { CancelTokenSource.Dispose(); };
 
+        if (_updateProgressBar != null)
+          _updateProgressBar.Invoke(0);
+
         _task = Task.Run(action, CancelTokenSource.Token);
         _isRunning = true;
       }
@@ -76,25 +79,25 @@ namespace OSProj.TaskProcessor.ThreadExecutors
     public virtual void SetSuspendedState()
     {
       TaskStatus = OSTaskStatus.Suspended;
-      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the SUSPENDED queue.");
+      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the SUSPENDED queue. TERMINATE.");
     }
 
     public virtual void SetReadyFromSuspended()
     {
       TaskStatus = OSTaskStatus.Ready;
-      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the READY queue.");
+      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the READY queue from SUSPENDED. ACTIVATE.");
     }
 
     public virtual void SetReadyFromRunning()
     {
       TaskStatus = OSTaskStatus.Ready;
-      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the READY queue from RUNNING.");
+      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the READY queue from RUNNING. PREEMPT.");
     }
 
     public virtual void SetRunningState()
     {
       TaskStatus = OSTaskStatus.Running;
-      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} start executing. It's RUNNING.");
+      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} start executing. RUNNING.");
     }
 
     public void SetUpdateProgressBaseDelegate(OSTaskProcessor.UpdateProgressBarDelegate updateProgressBar)

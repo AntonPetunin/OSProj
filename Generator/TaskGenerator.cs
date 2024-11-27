@@ -44,7 +44,7 @@ namespace OSProj.Generator
 
     private TaskType CreateTaskType(Random random)
     {
-      double rndNum = random.Next(0, 101);
+      double rndNum = random.Next(0, 100);
       return (TaskType)Math.Round(rndNum / 100);
     }
   }

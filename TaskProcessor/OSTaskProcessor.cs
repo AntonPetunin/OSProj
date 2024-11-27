@@ -34,6 +34,7 @@ namespace OSProj.TaskProcessor
       _taskGenerator.Generate();
       List<IOSTask> tasks = _taskGenerator.PopGenerated();
       _taskContainer.AddTasks(tasks);
+      OnGenerateHandler();
       _taskContainer.UpdateSubscriber();
     }
 
@@ -61,6 +62,8 @@ namespace OSProj.TaskProcessor
             {
               _activeTask.Wait();
             }
+
+            _taskContainer.UpdateSubscriber();
           }
           else
           {
@@ -105,6 +108,17 @@ namespace OSProj.TaskProcessor
         Terminate(_activeTask);
     }
 
+    private bool OnGenerateHandler()
+    {
+      if (_taskContainer.GetNextTaskPriority() > _activeTask?.Priority)
+      {
+        Preempt(_activeTask);
+        return false;
+      }
+
+      return true;
+    }
+
 
     private bool OnTaskWaitCheckHandler(IOSTask task)
     {
@@ -117,14 +131,10 @@ namespace OSProj.TaskProcessor
         _taskContainer.FillMainContainerFromSource();
         _logger.Info("Ready queue is filling by source containers.");
 
-        if (_taskContainer.GetNextTaskPriority() > task.Priority)
-        {
-          Preempt(task);
-          needWait = false;
-        }
+        needWait = OnGenerateHandler();
       }
       else if (waitPriority > -1)
-      { 
+      {
         Release();
       }
 

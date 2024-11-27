@@ -32,7 +32,7 @@ namespace OSProj
     //public TaskQueue? SuspendedTasks { get { return _suspendedCollection; } }
 
     public ObservableCollection<IOSTask> Tasks { get; } = new();
-    
+
 
     public ProcessorInfo(OSTaskProcessor processor, ProgressBar progressBar, Dispatcher dispatcher)
     {

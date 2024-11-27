@@ -29,7 +29,15 @@ namespace OSProj.TaskProcessor.ThreadExecutors
       if (!_isRunning)
       {
         CancelTokenSource = new CancellationTokenSource();
-        _task = Task.Run(ThreadFunction, CancelTokenSource.Token);
+        Action action= () =>
+        {
+          while (!CancelTokenSource.Token.IsCancellationRequested)
+            ThreadFunction();
+
+          CancelTokenSource.Dispose();
+        };
+
+        _task = Task.Run(action, CancelTokenSource.Token);
         _isRunning = true;
       }
     }
