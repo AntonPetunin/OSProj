@@ -35,6 +35,11 @@ namespace OSProj.Generator
       }
     }
 
+    public void AddUserTask(IOSTask task)
+    {
+      _tasks.Add(task);
+    }
+
     public List<IOSTask> PopGenerated()
     {
       var res = new List<IOSTask>(_tasks);

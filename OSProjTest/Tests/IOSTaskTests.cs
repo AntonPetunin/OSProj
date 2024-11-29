@@ -1,4 +1,5 @@
 ﻿using OSProj.Generator;
+using OSProj.TaskProcessor;
 using OSProj.TaskProcessor.ThreadExecutors;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OSProjTest.Tests
 {
-  public class IOTaskTests
+  public class IOSTaskTests
   {
     [Fact]
     public void BaseOSTask_PropTest()
@@ -27,11 +28,20 @@ namespace OSProjTest.Tests
       Thread.Sleep(200);
       Assert.Equal(baseTask.Id + 1, id);
 
-      var action = () => { Thread.Sleep(5000); };
-      var baseTask1 = new BaseOSTask(id, priority, action);
+      var action = () => { Thread.Sleep(1000); };
+      var baseTask1 = new BaseOSTask(id, priority, action, 2);
+      OSTaskProcessor.UpdateProgressBarDelegate updateProgress = (double persent) =>
+      {
+        if (persent > 0.001)
+        {
+          Assert.True(Math.Abs(persent - 0.5) < 0.001);
+          baseTask1.Cancel();
+        }
+      };
 
+      baseTask1.SetUpdateProgressBaseDelegate(updateProgress);
       baseTask1.Run();
-      baseTask1.Cancel();
+      baseTask1.Wait();
       baseTask1.Dispose();
 
       Assert.False(baseTask1.IsRunning);
@@ -63,11 +73,22 @@ namespace OSProjTest.Tests
       Assert.True(extendedTask1.Paused);
       extendedTask1.Dispose();
 
-      var action2 = () => { Thread.Sleep(5000); };
-      var extendedTask2 = new ExtendedOSTask(id + 2, priority, action2);
+      var action2 = () => { Thread.Sleep(1000); };
+      var extendedTask2 = new ExtendedOSTask(id + 2, priority, action2, 2);
+      OSTaskProcessor.UpdateProgressBarDelegate updateProgress = (double persent) =>
+      {
+        if (persent > 0.001)
+        {
+          Assert.True(Math.Abs(persent - 0.5) < 0.001);
+          extendedTask2.Cancel();
+        }
+      };
+
+      extendedTask2.SetUpdateProgressBaseDelegate(updateProgress);
       extendedTask2.Run();
-      extendedTask2.Cancel();
+      extendedTask2.Wait();
       extendedTask2.Dispose();
+
       Assert.False(extendedTask2.IsRunning);
     }
   }

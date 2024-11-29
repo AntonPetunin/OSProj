@@ -27,10 +27,10 @@ namespace OSProjTest.Tests
     }
 
     [Fact]
-    public void OSTaskProcessor_TerminateExtendedTaskExcution()
+    public void OSTaskProcessor_TerminateExtendedTaskExecution()
     {
       OSTaskProcessor processor = new(LogManager.GetCurrentClassLogger());
-      processor.SetGenerator(new TaskGenerator { GenerationCount = 5 });
+      processor.SetGenerator(new TaskGenerator { GenerationCount = 100 });
       processor.Generate();
       processor.Start();
 
@@ -42,15 +42,14 @@ namespace OSProjTest.Tests
 
         if (activeTask != null && activeTask.TaskType == TaskType.Extended)
         {
-          if (activeTask != null && _terminatedTaskId == 0)
+          if (_terminatedTaskId == 0)
           {
             _terminatedTaskId = activeTask.Id;
             processor.TerminateActiveTask();
           }
-          else if (activeTask != null && _terminatedTaskId != 0 && activeTask.Id != _terminatedTaskId && !_canActivate)
+          else if (!suspendedTasks.Empty && !_canActivate)
           {
-            Assert.NotEqual(activeTask.Id, _terminatedTaskId);
-            Assert.NotEmpty(suspendedTasks.Get());
+            Assert.Equal(activeTask.Id, _terminatedTaskId);
             Assert.Equal(_terminatedTaskId, suspendedTasks.Next?.Id);
 
             _canActivate = true;
@@ -73,10 +72,10 @@ namespace OSProjTest.Tests
     }
 
     [Fact]
-    public void OSTaskProcessor_TerminateBaseTaskExcution()
+    public void OSTaskProcessor_TerminateBaseTaskExecution()
     {
       OSTaskProcessor processor = new(LogManager.GetCurrentClassLogger());
-      processor.SetGenerator(new TaskGenerator { GenerationCount = 5 });
+      processor.SetGenerator(new TaskGenerator { GenerationCount = 100 });
       processor.Generate();
       processor.Start();
 
@@ -93,19 +92,19 @@ namespace OSProjTest.Tests
             _terminatedTaskId = activeTask.Id;
             processor.TerminateActiveTask();
           }
-          else if (_terminatedTaskId != 0 && activeTask.Id != _terminatedTaskId && !_canActivate)
+          else if (!suspendedTasks.Empty && !_canActivate)
           {
-            Assert.NotEqual(activeTask.Id, _terminatedTaskId);
-            Assert.NotEmpty(suspendedTasks.Get());
+            Assert.Equal(activeTask.Id, _terminatedTaskId);
             Assert.Equal(_terminatedTaskId, suspendedTasks.Next?.Id);
 
             _canActivate = true;
             processor.Activate();
           }
-          else if (_canActivate)
+          else if (_canActivate && suspendedTasks.Empty)
           {
             Assert.Empty(suspendedTasks.Get());
-
+            processor.Activate();
+            _canActivate = false;
             processor.Stop();
             _waitingEvent.Set();
           }
@@ -119,10 +118,10 @@ namespace OSProjTest.Tests
     }
 
     [Fact]
-    public void OSTaskProcessor_WaitExtendedTaskExcution()
+    public void OSTaskProcessor_WaitExtendedTaskExecution()
     {
       OSTaskProcessor processor = new(LogManager.GetCurrentClassLogger());
-      processor.SetGenerator(new TaskGenerator { GenerationCount = 10 });
+      processor.SetGenerator(new TaskGenerator { GenerationCount = 100 });
       processor.Generate();
       processor.Start();
 
@@ -136,24 +135,19 @@ namespace OSProjTest.Tests
         {
           if (_waitingTaskId == 0)
           {
-            if (activeTask.TaskType == TaskType.Extended)
-            {
-              _waitingTaskId = activeTask.Id;
-              processor.PauseActiveTask();
-            }
+            _waitingTaskId = activeTask.Id;
+            processor.PauseActiveTask();
+
           }
-          else if (_waitingTaskId != 0 && activeTask.TaskType == TaskType.Extended && !_canRelease)
+          else if (!waitingTasks.Empty && !_canRelease)
           {
             Assert.Equal(_waitingTaskId, activeTask.Id);
-            Assert.NotEmpty(waitingTasks.Get());
-
             _canRelease = true;
             processor.Release();
           }
           else if (_canRelease)
           {
             Assert.Empty(waitingTasks.Get());
-
             processor.Stop();
             _waitingEvent.Set();
           }

@@ -4,7 +4,7 @@ using NLog;
 using NLog.Config;
 using System.Windows.Controls;
 
-namespace OSProj
+namespace OSProj.View
 {
   public partial class MainWindow : Window
   {

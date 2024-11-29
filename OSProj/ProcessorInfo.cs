@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
-namespace OSProj
+namespace OSProj.View
 {
   public class ProcessorInfo
   {

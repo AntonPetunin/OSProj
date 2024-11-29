@@ -29,12 +29,12 @@ namespace OSProj.TaskProcessor.ThreadExecutors
         {
           action = () =>
           {
-            for (long i = 0; i < _loopingCount && !CancelTokenSource.Token.IsCancellationRequested; i++)
+            for (long i = 1; i <= _loopingCount && !CancelTokenSource.Token.IsCancellationRequested; i++)
             {
               ThreadFunction();
               if (_updateProgressBar != null)
               {
-                double persentage = (double)i / (_loopingCount - 1);
+                double persentage = (double)i / (_loopingCount);
                 _updateProgressBar.Invoke(persentage);
               }
             }
@@ -79,25 +79,25 @@ namespace OSProj.TaskProcessor.ThreadExecutors
     public virtual void SetSuspendedState()
     {
       TaskStatus = OSTaskStatus.Suspended;
-      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the SUSPENDED queue. TERMINATE.");
+      View.ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the SUSPENDED queue. TERMINATE.");
     }
 
     public virtual void SetReadyFromSuspended()
     {
       TaskStatus = OSTaskStatus.Ready;
-      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the READY queue from SUSPENDED. ACTIVATE.");
+      View.ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the READY queue from SUSPENDED. ACTIVATE.");
     }
 
     public virtual void SetReadyFromRunning()
     {
       TaskStatus = OSTaskStatus.Ready;
-      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the READY queue from RUNNING. PREEMPT.");
+      View.ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} has been placed in the READY queue from RUNNING. PREEMPT.");
     }
 
     public virtual void SetRunningState()
     {
       TaskStatus = OSTaskStatus.Running;
-      ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} start executing. RUNNING.");
+      View.ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} start executing. RUNNING.");
     }
 
     public void SetUpdateProgressBaseDelegate(OSTaskProcessor.UpdateProgressBarDelegate updateProgressBar)

@@ -73,6 +73,7 @@ namespace OSProj.TaskProcessor
           else
           {
             Thread.Sleep(1000);
+            _taskContainer.UpdateSubscriber();
           }
         };
 
@@ -148,7 +149,7 @@ namespace OSProj.TaskProcessor
 
     private void Preempt(IOSTask task)
     {
-      task.Cancel(); // Временно
+      task.Cancel();
       task.SetReadyFromRunning();
       _taskContainer.AddTaskToMain(task);
     }
