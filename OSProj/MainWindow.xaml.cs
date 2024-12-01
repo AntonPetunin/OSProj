@@ -16,7 +16,7 @@ namespace OSProj.View
     {
       InitializeComponent();
 
-      _info = new(_processor, TaskProgressBar, Dispatcher);
+      _info = new(_processor, PauseTask_btn, TaskProgressBar, Dispatcher);
       TextBoxTarget.LogAction = AppendLogToTextBox;
     }
 

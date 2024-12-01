@@ -2,7 +2,7 @@ using OSProj.TaskProcessor.ThreadExecutors;
 
 namespace OSProj.TaskProcessor
 {
-    public class TaskQueue
+  public class TaskQueue
   {
     private LinkedList<IOSTask> _queue = new();
     public bool IsSorted { get; }
@@ -34,18 +34,15 @@ namespace OSProj.TaskProcessor
       {
         var element = _queue.First;
 
-        if (element != null)
+        while (element != null)
         {
-          while (element.Next != null)
+          if (CompareTasks(element.Value, item))
           {
-            if (element.Value.Priority < item.Priority)
-            {
-              _queue.AddBefore(element, item);
-              break;
-            }
-
-            element = element.Next;
+            _queue.AddBefore(element, item);
+            break;
           }
+
+          element = element.Next;
         }
       }
     }
@@ -60,5 +57,10 @@ namespace OSProj.TaskProcessor
       return res;
     }
 
+
+    private bool CompareTasks(IOSTask task1, IOSTask task2)
+    {
+      return task1.Priority < task2.Priority || task1.Priority == task2.Priority && task1.CreationTime > task2.CreationTime;
+    }
   }
 }

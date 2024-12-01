@@ -10,12 +10,14 @@ namespace OSProj.TaskProcessor.ThreadExecutors
     public int Priority { get; }
     public virtual TaskType TaskType { get { return TaskType.Base; } }
     public OSTaskStatus TaskStatus { get; set; } = OSTaskStatus.Ready;
+    public DateTime CreationTime { get; }
 
     public BaseOSTask(int id, int priority, Action threadFunc, uint loopingCount = 0)
       : base(threadFunc, loopingCount)
     {
       Id = id;
       Priority = priority;
+      CreationTime = DateTime.UtcNow;
     }
 
     public override void Run()
@@ -48,8 +50,6 @@ namespace OSProj.TaskProcessor.ThreadExecutors
               ThreadFunction();
           };
         }
-
-        action += () => { CancelTokenSource.Dispose(); };
 
         if (_updateProgressBar != null)
           _updateProgressBar.Invoke(0);
@@ -100,7 +100,7 @@ namespace OSProj.TaskProcessor.ThreadExecutors
       View.ProcessorInfo.logger.Info($"BASE: id={Id} with priority={Priority} start executing. RUNNING.");
     }
 
-    public void SetUpdateProgressBaseDelegate(OSTaskProcessor.UpdateProgressBarDelegate updateProgressBar)
+    public void SetUpdateProgressBarDelegate(OSTaskProcessor.UpdateProgressBarDelegate updateProgressBar)
     {
       _updateProgressBar = updateProgressBar;
     }

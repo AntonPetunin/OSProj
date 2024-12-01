@@ -65,11 +65,7 @@ namespace OSProj.TaskProcessor.ThreadExecutors
             };
           }
 
-          action += () =>
-          {
-            _processorThreadEvent.Set();
-            CancelTokenSource.Dispose();
-          };
+          action += _processorThreadEvent.Set;
 
           if (_updateProgressBar != null)
             _updateProgressBar.Invoke(0);
@@ -87,7 +83,6 @@ namespace OSProj.TaskProcessor.ThreadExecutors
     public override void Cancel()
     {
       base.Cancel();
-      _processorThreadEvent.Set();
     }
 
     public override void Wait()

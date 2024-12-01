@@ -20,7 +20,7 @@
             </ListView.View>
         </ListView>
         <Button Content="Остановить" IsEnabled="False" x:Name="Stop_btn" HorizontalAlignment="Left" Margin="34,76,0,0" VerticalAlignment="Top" Height="24" Width="150" Visibility="Visible" Click="Stop_btn_Click"/>
-        <Button Content="Приостановить" x:Name="PauseTask_btn" HorizontalAlignment="Left" Margin="662,32,0,0" VerticalAlignment="Top" Height="25" Width="103" Click="PauseTask_btn_Click"/>
+        <Button Content="Приостановить" IsEnabled="False" x:Name="PauseTask_btn" HorizontalAlignment="Left" Margin="662,32,0,0" VerticalAlignment="Top" Height="25" Width="103" Click="PauseTask_btn_Click"/>
         <Button Content="Прервать" x:Name="TerminateTask_btn" HorizontalAlignment="Left" Margin="662,64,0,0" VerticalAlignment="Top" Height="25" Width="103" Click="TerminateTask_btn_Click"/>
         <TextBox x:Name="LogTextBox" 
                  VerticalScrollBarVisibility="Auto" 

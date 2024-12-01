@@ -40,14 +40,14 @@ namespace OSProj.TaskProcessor
       List<IOSTask> tasks = _taskGenerator.PopGenerated();
       _taskContainer.AddTasks(tasks);
       OnGenerateHandler();
-      _taskContainer.UpdateSubscriber();
+      _taskContainer.UpdateCollectionView();
     }
 
     public void Start()
     {
       if (_processingThread == null)
       {
-        Action threadAction = () =>
+        Action taskPlanner = () =>
         {
           Thread.CurrentThread.IsBackground = true;
 
@@ -58,26 +58,36 @@ namespace OSProj.TaskProcessor
             Task.Delay(200);
 
             if (_updateProgressBar != null)
-              _activeTask.SetUpdateProgressBaseDelegate(_updateProgressBar);
+              _activeTask.SetUpdateProgressBarDelegate(_updateProgressBar);
 
             _activeTask.Run();
-            _taskContainer.UpdateSubscriber();
+            _taskContainer.UpdateCollectionView();
 
             if (OnTaskWaitCheck != null && OnTaskWaitCheck.Invoke(_activeTask))
             {
               _activeTask.Wait();
+
+              if (_activeTask.TaskType == TaskType.Base)
+                _activeTask.Dispose();
+              else
+              {
+                var extTask = (ExtendedOSTask)_activeTask;
+
+                if (extTask != null && !extTask.Paused)
+                  _activeTask.Dispose();
+              }
             }
 
-            _taskContainer.UpdateSubscriber();
+            _taskContainer.UpdateCollectionView();
           }
           else
           {
             Thread.Sleep(1000);
-            _taskContainer.UpdateSubscriber();
+            _taskContainer.UpdateCollectionView();
           }
         };
 
-        _processingThread = new ThreadExecutor(threadAction);
+        _processingThread = new ThreadExecutor(taskPlanner);
         _processingThread.Run();
         _logger.Info("Task processor was started.");
       }
@@ -158,7 +168,7 @@ namespace OSProj.TaskProcessor
     {
       if (_taskContainer.AddTaskToWaiting(task))
       {
-        ((ExtendedOSTask)task).Pause();
+        ((ExtendedOSTask)task)?.Pause();
       }
     }
 
@@ -176,6 +186,9 @@ namespace OSProj.TaskProcessor
     public void Activate()
     {
       _taskContainer.FillMainContainerFromSuspended();
+
+      if (_activeTask != null && _activeTask.Priority < _taskContainer.GetNextTaskPriority())
+        Preempt(_activeTask);
     }
   }
 }

@@ -39,7 +39,7 @@ namespace OSProjTest.Tests
         }
       };
 
-      baseTask1.SetUpdateProgressBaseDelegate(updateProgress);
+      baseTask1.SetUpdateProgressBarDelegate(updateProgress);
       baseTask1.Run();
       baseTask1.Wait();
       baseTask1.Dispose();
@@ -84,7 +84,7 @@ namespace OSProjTest.Tests
         }
       };
 
-      extendedTask2.SetUpdateProgressBaseDelegate(updateProgress);
+      extendedTask2.SetUpdateProgressBarDelegate(updateProgress);
       extendedTask2.Run();
       extendedTask2.Wait();
       extendedTask2.Dispose();

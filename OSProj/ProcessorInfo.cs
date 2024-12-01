@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using System.Windows.Input;
 
 namespace OSProj.View
 {
@@ -26,19 +27,17 @@ namespace OSProj.View
     private Dispatcher _dispatcher;
 
     private ProgressBar _progressBar;
-
-    //public TaskQueue? MainTasks { get { return _mainTasksCollection; } }
-    //public TaskQueue? WaitingTask { get { return _waitingCollection; } }
-    //public TaskQueue? SuspendedTasks { get { return _suspendedCollection; } }
+    private Button _pauseButton;
 
     public ObservableCollection<IOSTask> Tasks { get; } = new();
 
 
-    public ProcessorInfo(OSTaskProcessor processor, ProgressBar progressBar, Dispatcher dispatcher)
+    public ProcessorInfo(OSTaskProcessor processor, Button pauseButton, ProgressBar progressBar, Dispatcher dispatcher)
     {
       _dispatcher = dispatcher;
       _progressBar = progressBar;
       _processor = processor;
+      _pauseButton = pauseButton;
       _processor.SetUpdateProcessorInfoDelegate(UpdateQueuesInfo);
       _processor.SetUpdateProgressBarDelegate(UpdateActiveTaskProgress);
       ConfigureLogging();
@@ -78,7 +77,10 @@ namespace OSProj.View
           Tasks.Clear();
 
           if (_activeTask != null)
+          {
             Tasks.Add(_activeTask);
+            _pauseButton.IsEnabled = _activeTask.TaskType == Generator.TaskType.Extended;
+          }
 
           foreach (var task in refreshTasks)
             Tasks.Add(task);

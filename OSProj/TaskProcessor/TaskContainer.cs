@@ -28,27 +28,32 @@ namespace OSProj.TaskProcessor
     public void SetUpdateQueuesInfo(UpdateQueuesInfo updateDelegate)
     {
       _updateDelegate = updateDelegate;
-      UpdateSubscriber();
+      UpdateCollectionView();
     }
 
-    public void UpdateSubscriber()
+    public void UpdateCollectionView()
     {
       if (_updateDelegate != null)
-        _updateDelegate(_activeTask, _mainTasksCollection, _waitingCollection, _suspendedCollection);
+      {
+        lock (_mainTasksCollection) lock (_waitingCollection) lock (_suspendedCollection)
+            {
+              _updateDelegate(_activeTask, _mainTasksCollection, _waitingCollection, _suspendedCollection);
+            }
+      }
     }
 
     public int? GetNextTaskPriority()
     {
-      return _mainTasksCollection.Next?.Priority;
+      lock (_mainTasksCollection)
+      {
+        return _mainTasksCollection.Next?.Priority;
+      }
     }
 
     public IOSTask? GetTopTaskAsActive()
     {
-      lock(_mainTasksCollection)
-      {
-        _activeTask = PopMainTask();
-        return _activeTask;
-      }
+      _activeTask = PopMainTask();
+      return _activeTask;
     }
 
     public IOSTask? PopMainTask()
@@ -66,7 +71,7 @@ namespace OSProj.TaskProcessor
       if (result)
       {
         _mainTasksCollection.Push(task);
-        UpdateSubscriber();
+        UpdateCollectionView();
       }
 
       return result;
@@ -78,9 +83,12 @@ namespace OSProj.TaskProcessor
 
       if (res)
       {
-        _waitingCollection.Push(task);
-        ((IExtendedTasksStateSetter)task).SetWaitingState();
-        UpdateSubscriber();
+        lock (_waitingCollection)
+        {
+          _waitingCollection.Push(task);
+          ((IExtendedTasksStateSetter)task)?.SetWaitingState();
+          UpdateCollectionView();
+        }
       }
 
       return res;
@@ -92,9 +100,12 @@ namespace OSProj.TaskProcessor
 
       if (res)
       {
-        task.SetSuspendedState();
-        _suspendedCollection.Push(task);
-        UpdateSubscriber();
+        lock (_suspendedCollection)
+        {
+          task.SetSuspendedState();
+          _suspendedCollection.Push(task);
+          UpdateCollectionView();
+        }
       }
 
       return res;
@@ -157,7 +168,7 @@ namespace OSProj.TaskProcessor
       }
 
       if (!isAllEmpty)
-        UpdateSubscriber();
+        UpdateCollectionView();
     }
 
     public void FillMainContainerFromWaiting()
@@ -174,9 +185,12 @@ namespace OSProj.TaskProcessor
 
           if (task != null)
           {
-            _mainTasksCollection.Push(task);
-            ((IExtendedTasksStateSetter)task).SetReadyFromWaiting();
-            UpdateSubscriber();
+            lock (_mainTasksCollection)
+            {
+              _mainTasksCollection.Push(task);
+              ((IExtendedTasksStateSetter)task).SetReadyFromWaiting();
+              UpdateCollectionView();
+            }
           }
         }
       }
@@ -196,9 +210,12 @@ namespace OSProj.TaskProcessor
 
           if (task != null)
           {
-            _mainTasksCollection.Push(task);
-            task.SetReadyFromSuspended();
-            UpdateSubscriber();
+            lock (_mainTasksCollection)
+            {
+              _mainTasksCollection.Push(task);
+              task.SetReadyFromSuspended();
+              UpdateCollectionView();
+            }
           }
         }
       }
