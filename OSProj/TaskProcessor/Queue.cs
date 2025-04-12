@@ -33,17 +33,22 @@ namespace OSProj.TaskProcessor
       else
       {
         var element = _queue.First;
+        var added = false;
 
         while (element != null)
         {
           if (CompareTasks(element.Value, item))
           {
             _queue.AddBefore(element, item);
+            added = true;
             break;
           }
 
           element = element.Next;
         }
+
+        if (!added)
+          _queue.AddLast(item);
       }
     }
 
@@ -60,7 +65,7 @@ namespace OSProj.TaskProcessor
 
     private bool CompareTasks(IOSTask task1, IOSTask task2)
     {
-      return task1.Priority < task2.Priority || task1.Priority == task2.Priority && task1.CreationTime > task2.CreationTime;
+      return task1.Priority < task2.Priority || task1.Priority == task2.Priority && task1.CreationTime < task2.CreationTime;
     }
   }
 }

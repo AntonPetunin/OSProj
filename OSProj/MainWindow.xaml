@@ -31,6 +31,7 @@
                      Margin="223,56,177,0" Height="25" Minimum="0" Maximum="100" />
         <Label Content="Выполнение задачи" HorizontalAlignment="Left" Margin="368,29,0,0" VerticalAlignment="Top" Height="40" Width="146"/>
         <Button Content="Перезапустить задачи" x:Name="Activate_Task_Copy" HorizontalAlignment="Left" Margin="35,465,0,0" VerticalAlignment="Top" Height="24" Width="150" Click="Activate_Task_Click"/>
+        <Button Content="Вытащить из ожидания" x:Name="Release_Task" HorizontalAlignment="Left" Margin="210,465,0,0" VerticalAlignment="Top" Height="24" Width="150" Click="Release_Task_Click"/>
 
     </Grid>
 

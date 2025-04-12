@@ -149,10 +149,10 @@ namespace OSProj.TaskProcessor
 
         needWait = OnGenerateHandler();
       }
-      else if (waitPriority > -1)
-      {
-        Release();
-      }
+      //else if (waitPriority > -1)
+      //{
+      //  Release();
+      //}
 
       return needWait;
     }
@@ -175,6 +175,8 @@ namespace OSProj.TaskProcessor
     public void Release()
     {
       _taskContainer.FillMainContainerFromWaiting();
+      if (_activeTask != null && _activeTask.Priority < _taskContainer.GetNextTaskPriority())
+        Preempt(_activeTask);
     }
 
     private void Terminate(IOSTask task)

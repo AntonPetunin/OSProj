@@ -76,5 +76,10 @@ namespace OSProj.View
     {
       _processor.Activate();
     }
+
+    private void Release_Task_Click(object sender, RoutedEventArgs e)
+    {
+      _processor.Release();
+    }
   }
 }
