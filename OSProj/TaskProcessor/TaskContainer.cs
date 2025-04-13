@@ -7,14 +7,14 @@ namespace OSProj.TaskProcessor
     public int MaxMainContainerSize { get; set; } = 8;
 
     private IOSTask? _activeTask;
-    private TaskQueue _mainTasksCollection = new();
-    private TaskQueue _priority0Tasks = new();
-    private TaskQueue _priority1Tasks = new();
-    private TaskQueue _priority2Tasks = new();
-    private TaskQueue _priority3Tasks = new();
+    private readonly TaskQueue _mainTasksCollection = new();
+    private readonly TaskQueue _priority0Tasks = new();
+    private readonly TaskQueue _priority1Tasks = new();
+    private readonly TaskQueue _priority2Tasks = new();
+    private readonly TaskQueue _priority3Tasks = new();
 
-    private TaskQueue _waitingCollection = new();
-    private TaskQueue _suspendedCollection = new();
+    private readonly TaskQueue _waitingCollection = new();
+    private readonly TaskQueue _suspendedCollection = new();
 
     public delegate void UpdateQueuesInfo(IOSTask? activeTask, TaskQueue mainTasks, TaskQueue waitingTasks, TaskQueue suspendedTasks);
     private UpdateQueuesInfo? _updateDelegate;
@@ -245,17 +245,6 @@ namespace OSProj.TaskProcessor
         res = 0;
 
       return res;
-    }
-
-
-    private IOSTask? PopWaitingTask()
-    {
-      return _waitingCollection.Pop();
-    }
-
-    private IOSTask? PopSuspendedTask()
-    {
-      return _suspendedCollection.Pop();
     }
 
   }

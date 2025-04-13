@@ -2,19 +2,13 @@ using OSProj.TaskProcessor.ThreadExecutors;
 
 namespace OSProj.TaskProcessor
 {
-  public class TaskQueue
+  public class TaskQueue(bool isSorted = true)
   {
-    private LinkedList<IOSTask> _queue = new();
-    public bool IsSorted { get; }
+    private readonly LinkedList<IOSTask> _queue = new();
+    public bool IsSorted { get; } = isSorted;
     public int Count => _queue.Count;
     public IOSTask? Next => _queue.Count > 0 ? _queue.First() : null;
     public bool Empty => _queue.Count == 0;
-
-
-    public TaskQueue(bool isSorted = true)
-    {
-      IsSorted = isSorted;
-    }
 
     public IEnumerable<IOSTask> Get()
     {
@@ -63,7 +57,7 @@ namespace OSProj.TaskProcessor
     }
 
 
-    private bool CompareTasks(IOSTask task1, IOSTask task2)
+    public static bool CompareTasks(IOSTask task1, IOSTask task2)
     {
       return task1.Priority < task2.Priority || task1.Priority == task2.Priority && task1.CreationTime < task2.CreationTime;
     }

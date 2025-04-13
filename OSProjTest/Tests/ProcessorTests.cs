@@ -1,8 +1,6 @@
-using OSProj.TaskProcessor;
-using OSProj.TaskProcessor.ThreadExecutors;
-using OSProj.Generator;
-using Xunit;
 using NLog;
+using OSProj.Generator;
+using OSProj.TaskProcessor;
 
 namespace OSProjTest.Tests
 {
@@ -13,7 +11,7 @@ namespace OSProjTest.Tests
     bool _canActivate = false;
     bool _canRelease = false;
 
-    private ManualResetEvent _waitingEvent = new(false);
+    private readonly ManualResetEvent _waitingEvent = new(false);
 
     [Fact]
     public void OSTaskProcessor_StartedStopProcessor()

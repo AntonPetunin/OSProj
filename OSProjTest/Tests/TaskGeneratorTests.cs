@@ -1,7 +1,5 @@
 using OSProj.Generator;
-using OSProj.TaskProcessor;
 using OSProj.TaskProcessor.ThreadExecutors;
-using Xunit;
 
 namespace OSProjTest.Tests
 {

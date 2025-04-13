@@ -1,10 +1,7 @@
 ﻿using NLog;
-using NLog.Config;
 using NLog.Targets;
-using System;
-using System.Windows;
 
-namespace OSProj.View
+namespace OSProj
 {
   [Target("TextBoxTarget")]
   public sealed class TextBoxTarget : TargetWithLayout

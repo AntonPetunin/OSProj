@@ -1,10 +1,4 @@
 ﻿using OSProj.Generator;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace OSProj.TaskProcessor.ThreadExecutors
 {
@@ -67,9 +61,7 @@ namespace OSProj.TaskProcessor.ThreadExecutors
 
           action += _processorThreadEvent.Set;
 
-          if (_updateProgressBar != null)
-            _updateProgressBar.Invoke(0);
-
+          _updateProgressBar?.Invoke(0);
           _task = Task.Run(action, CancelTokenSource.Token);
           _isRunning = true;
         }
@@ -112,37 +104,37 @@ namespace OSProj.TaskProcessor.ThreadExecutors
     public void SetWaitingState()
     {
       TaskStatus = OSTaskStatus.Waiting;
-      View.ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the WAITING queue. (WAIT).");
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the WAITING queue. (WAIT).");
     }
 
     public override void SetSuspendedState()
     {
       TaskStatus = OSTaskStatus.Suspended;
-      View.ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the SUSPENDED queue. TERMINATE");
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the SUSPENDED queue. TERMINATE");
     }
 
     public override void SetReadyFromSuspended()
     {
       TaskStatus = OSTaskStatus.Ready;
-      View.ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the READY queue from SUSPENDED. ACTIVATE");
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the READY queue from SUSPENDED. ACTIVATE");
     }
 
     public void SetReadyFromWaiting()
     {
       TaskStatus = OSTaskStatus.Ready;
-      View.ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the READY queue from WAITING. RELEASE");
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the READY queue from WAITING. RELEASE");
     }
 
     public override void SetReadyFromRunning()
     {
       TaskStatus = OSTaskStatus.Ready;
-      View.ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the READY queue from RUNNING. PREEMPT.");
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} has been placed in the READY queue from RUNNING. PREEMPT.");
     }
 
     public override void SetRunningState()
     {
       TaskStatus = OSTaskStatus.Running;
-      View.ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} start executing. RUNNING.");
+      ProcessorInfo.logger.Info($"EXTENDED: id={Id} with priority={Priority} start executing. RUNNING.");
     }
   }
 }

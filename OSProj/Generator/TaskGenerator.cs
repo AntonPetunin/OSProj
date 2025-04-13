@@ -4,14 +4,14 @@ namespace OSProj.Generator
 {
   public class TaskGenerator
   {
-    private List<IOSTask> _tasks = new();
-    private Tuple<int, int> _durationFork = Tuple.Create(4, 8);
+    private readonly List<IOSTask> _tasks = [];
+    private readonly Tuple<int, int> _durationFork = Tuple.Create(4, 8);
 
     public int GenerationCount { get; set; } = 5;
 
     public void Generate()
     {
-      Random rnd = new Random();
+      Random rnd = new();
       for (int i = 0; i < GenerationCount; i++)
       {
         TaskType taskType = CreateTaskType(rnd);
@@ -47,7 +47,7 @@ namespace OSProj.Generator
       return res;
     }
 
-    private TaskType CreateTaskType(Random random)
+    private static TaskType CreateTaskType(Random random)
     {
       double rndNum = random.Next(0, 100);
       return (TaskType)Math.Round(rndNum / 100);

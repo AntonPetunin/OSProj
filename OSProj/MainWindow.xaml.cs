@@ -1,16 +1,12 @@
 ﻿using OSProj.TaskProcessor;
 using System.Windows;
-using NLog;
-using NLog.Config;
-using System.Windows.Controls;
 
 namespace OSProj.View
 {
   public partial class MainWindow : Window
   {
-    private OSTaskProcessor _processor = new(ProcessorInfo.logger);
-    private ProcessorInfo _info;
-    private double ProgressValue { get; set; }
+    private readonly OSTaskProcessor _processor = new(ProcessorInfo.logger);
+    private readonly ProcessorInfo _info;
 
     public MainWindow()
     {

@@ -2,7 +2,6 @@
 using NLog;
 using OSProj.Generator;
 using OSProj.TaskProcessor.ThreadExecutors;
-using System.Threading.Tasks;
 
 namespace OSProj.TaskProcessor
 {
@@ -11,10 +10,10 @@ namespace OSProj.TaskProcessor
     public delegate void UpdateProgressBarDelegate(double percentage);
     private UpdateProgressBarDelegate? _updateProgressBar;
 
-    private TaskGenerator _taskGenerator = new TaskGenerator();
-    private TaskContainer _taskContainer = new TaskContainer();
+    private TaskGenerator _taskGenerator = new();
+    private readonly TaskContainer _taskContainer = new();
     private ThreadExecutor? _processingThread;
-    private Logger _logger;
+    private readonly Logger _logger;
     private volatile IOSTask? _activeTask = null;
 
     public bool Running { get { return _processingThread != null ? _processingThread.IsRunning : false; } }

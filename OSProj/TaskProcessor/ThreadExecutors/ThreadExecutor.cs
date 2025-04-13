@@ -1,12 +1,4 @@
-﻿using OSProj.Generator;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OSProj.TaskProcessor.ThreadExecutors
+﻿namespace OSProj.TaskProcessor.ThreadExecutors
 {
   public class ThreadExecutor
   {
@@ -29,7 +21,7 @@ namespace OSProj.TaskProcessor.ThreadExecutors
       if (!_isRunning)
       {
         CancelTokenSource = new CancellationTokenSource();
-        Action action= () =>
+        Action action = () =>
         {
           while (!CancelTokenSource.Token.IsCancellationRequested)
             ThreadFunction();
@@ -58,8 +50,7 @@ namespace OSProj.TaskProcessor.ThreadExecutors
 
     public virtual void Dispose()
     {
-      if (CancelTokenSource != null)
-        CancelTokenSource.Dispose();
+      CancelTokenSource?.Dispose();
     }
   }
 }

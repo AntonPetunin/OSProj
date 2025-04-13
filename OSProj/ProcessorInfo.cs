@@ -1,19 +1,12 @@
-﻿using NLog.Config;
-using NLog;
+﻿using NLog;
+using NLog.Config;
 using OSProj.TaskProcessor;
 using OSProj.TaskProcessor.ThreadExecutors;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using System.Windows.Input;
 
-namespace OSProj.View
+namespace OSProj
 {
   public class ProcessorInfo
   {
@@ -24,10 +17,10 @@ namespace OSProj.View
     private TaskQueue _mainTasksCollection = new();
     private TaskQueue _waitingCollection = new();
     private TaskQueue _suspendedCollection = new();
-    private Dispatcher _dispatcher;
+    private readonly Dispatcher _dispatcher;
 
-    private ProgressBar _progressBar;
-    private Button _pauseButton;
+    private readonly ProgressBar _progressBar;
+    private readonly Button _pauseButton;
 
     public ObservableCollection<IOSTask> Tasks { get; } = new();
 
@@ -84,16 +77,20 @@ namespace OSProj.View
 
           foreach (var task in refreshTasks)
             Tasks.Add(task);
-          Tasks.GroupBy(element => element.TaskType);
+
+          _ = Tasks.GroupBy(element => element.TaskType);
         }
       });
     }
 
-    private void ConfigureLogging()
+    public static void ConfigureLogging()
     {
+      var textBoxTarget = new TextBoxTarget
+      {
+        Layout = "${level:uppercase=true} ${message} ${exception:format=toString} ${longdate}\n\n"
+      };
+
       var config = new LoggingConfiguration();
-      var textBoxTarget = new TextBoxTarget();
-      textBoxTarget.Layout = "${level:uppercase=true} ${message} ${exception:format=toString} ${longdate}\n\n";
       config.AddRule(LogLevel.Info, LogLevel.Fatal, textBoxTarget);
       LogManager.Configuration = config;
     }

@@ -1,11 +1,6 @@
 ﻿using OSProj.Generator;
 using OSProj.TaskProcessor;
 using OSProj.TaskProcessor.ThreadExecutors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OSProjTest.Tests
 {
